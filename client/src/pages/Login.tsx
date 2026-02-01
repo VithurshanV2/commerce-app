@@ -3,15 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import { Eye, EyeOff } from 'lucide-react';
 import { assets } from '../assets/assets';
+import axiosInstance from '../config/axiosInstance';
+import { toast } from 'react-toastify';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const context = useContext(AppContext);
-
-  if (!context) return null;
-
-  const { backendUrl, setIsLoggedIn, globalLoading, setGlobalLoading } =
-    context;
 
   const [state, setState] = useState<'Login' | 'Sign Up'>('Login');
   const [name, setName] = useState('');
@@ -19,9 +16,64 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {};
+  if (!context) return null;
 
-  const handleGoogleLogin = () => {};
+  const {
+    backendUrl,
+    setIsLoggedIn,
+    setUserData,
+    globalLoading,
+    setGlobalLoading,
+  } = context;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      setGlobalLoading(true);
+
+      if (state === 'Sign Up') {
+        const { data } = await axiosInstance.post('/api/auth/register', {
+          name,
+          email,
+          password,
+          roleId: 2,
+        });
+
+        localStorage.setItem('token', data.token);
+        setIsLoggedIn(true);
+        setUserData(data.user);
+        toast.success(data.message || 'Registration successful!');
+        navigate('/user/items');
+      } else {
+        const { data } = await axiosInstance.post('/api/auth/login', {
+          email,
+          password,
+        });
+
+        localStorage.setItem('token', data.token);
+        setIsLoggedIn(true);
+        setUserData(data.user);
+        toast.success(data.message || 'Login successful!');
+
+        if (data.user.role === 'Admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/user/items');
+        }
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Authentication failed');
+    } finally {
+      setGlobalLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    setGlobalLoading(true);
+    window.open(backendUrl + '/api/auth/google', '_self');
+    console.log(backendUrl);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-500 to-purple-600 px-4">
@@ -84,7 +136,7 @@ const Login: React.FC = () => {
             disabled={globalLoading}
             className="w-full py-3 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {state}
+            {globalLoading ? 'Loading...' : state}
           </button>
 
           <div className="flex items-center my-4">
