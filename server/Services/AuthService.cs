@@ -8,16 +8,19 @@ namespace server.Services
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IJwtService _jwtService;
+        private readonly IGoogleAuthService _googleAuthService;
 
         public AuthService(
             IUserRepository userRepository,
             IPasswordHasher passwordHasher,
-            IJwtService jwtService
+            IJwtService jwtService,
+            IGoogleAuthService googleAuthService
             )
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _jwtService = jwtService;
+            _googleAuthService = googleAuthService;
         }
 
         public async Task<(bool Success, string Token, string Message)> RegisterAsync(
@@ -66,6 +69,37 @@ namespace server.Services
             var token = _jwtService.GenerateToken(user);
 
             return (true, token, "Login successful");
+        }
+
+        public async Task<(bool Success, string Token, string Message)> GoogleLoginAsync(string googleToken)
+        {
+            var (success, email, name) = await _googleAuthService.ValidateGoogleTokenAsync(googleToken);        
+        
+            if (!success)
+            {
+                return (false, string.Empty, "Invalid Google token");
+            }
+
+            var user = await _userRepository.GetByEmailAsync(email);
+
+            if (user == null)
+            {
+                user = new User
+                {
+                    Name = name,
+                    Email = email,
+                    PasswordHash = string.Empty,
+                    GoogleId = email,
+                    RoleId = 2
+                };
+
+                await _userRepository.CreateAsync(user);
+                user = await _userRepository.GetByEmailAsync(email);
+            }
+
+            var token = _jwtService.GenerateToken(user!);
+
+            return (true, token, "Google login successful");
         }
     }
 }

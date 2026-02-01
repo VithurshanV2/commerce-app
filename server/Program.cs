@@ -21,6 +21,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
 // Configure JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"]
