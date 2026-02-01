@@ -35,3 +35,6 @@ obj/
 *.user
 *.suo
 .vs/
+*.tmp
+*.bak
+*.backup
