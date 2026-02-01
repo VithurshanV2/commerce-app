@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { AppContext } from './context/AppContext';
 import { Route, Routes } from 'react-router-dom';
+import Login from './pages/Login';
 
 const App = () => {
   const context = useContext(AppContext);
@@ -21,7 +22,7 @@ const App = () => {
 
       <Routes>
         <Route path="/" element={<div>Home Page</div>} />
-        <Route path="/login" element={<div>Login Page</div>} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </div>
   );
