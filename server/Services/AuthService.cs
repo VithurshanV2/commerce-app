@@ -23,13 +23,13 @@ namespace server.Services
             _googleAuthService = googleAuthService;
         }
 
-        public async Task<(bool Success, string Token, string Message)> RegisterAsync(
+        public async Task<(bool Success, string Token, string Message, User? User)> RegisterAsync(
             string name, string email, string password, int roleId)
         {
             // Check if email already exists
             if (await _userRepository.EmailExistsAsync(email))
             {
-                return (false, string.Empty, "Email already registered");
+                return (false, string.Empty, "Email already registered", null);
             }
 
             // Create new user
@@ -47,37 +47,37 @@ namespace server.Services
             var createdUser = await _userRepository.GetByEmailAsync(email);
             var token = _jwtService.GenerateToken(createdUser!);
 
-            return (true, token, "Registration successful");
+            return (true, token, "Registration successful", createdUser);
         }
 
-        public async Task<(bool Success, string Token, string Message)> LoginAsync(string email, string password)
+        public async Task<(bool Success, string Token, string Message, User? User)> LoginAsync(string email, string password)
         {
             // Find user by email
             var user = await _userRepository.GetByEmailAsync(email);
             if (user == null)
             {
-                return (false, string.Empty, "Invalid email or password");
+                return (false, string.Empty, "Invalid email or password", null);
             }
 
             // Verify password
             if (!_passwordHasher.VerifyPassword(password, user.PasswordHash))
             {
-                return (false, string.Empty, "Invalid email or password");
+                return (false, string.Empty, "Invalid email or password", null);
             }
 
             // Generate token
             var token = _jwtService.GenerateToken(user);
 
-            return (true, token, "Login successful");
+            return (true, token, "Login successful", user);
         }
 
-        public async Task<(bool Success, string Token, string Message)> GoogleLoginAsync(string googleToken)
+        public async Task<(bool Success, string Token, string Message, User? User)> GoogleLoginAsync(string googleToken)
         {
             var (success, email, name) = await _googleAuthService.ValidateGoogleTokenAsync(googleToken);        
         
             if (!success)
             {
-                return (false, string.Empty, "Invalid Google token");
+                return (false, string.Empty, "Invalid Google token", null);
             }
 
             var user = await _userRepository.GetByEmailAsync(email);
@@ -99,7 +99,7 @@ namespace server.Services
 
             var token = _jwtService.GenerateToken(user!);
 
-            return (true, token, "Google login successful");
+            return (true, token, "Google login successful", user);
         }
     }
 }
