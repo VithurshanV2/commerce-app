@@ -46,11 +46,24 @@ namespace server.Controllers
             }
 
             return Ok(new { token, message });
-                
+        }
+
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+        {
+            var (success, token, message) = await _authService.GoogleLoginAsync(request.GoogleToken);
+
+            if (!success)
+            {
+                return BadRequest(new { message });
+            }
+
+            return Ok(new { token, message });
         }
     }
 
     // Request models
     public record RegisterRequest(string Name, string Email, string Password, int RoleId);
     public record LoginRequest(string Email, string Password);
+    public record GoogleLoginRequest(string GoogleToken);
 }
