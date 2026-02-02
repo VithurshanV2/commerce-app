@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { AppContext } from './context/AppContext';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
@@ -13,7 +13,12 @@ const App = () => {
     return null;
   }
 
-  const { globalLoading } = context;
+  const { globalLoading, isLoggedIn, userData } = context;
+
+  const getDefaultRoute = () => {
+    if (!isLoggedIn || !userData) return '/login';
+    return userData.role === 'Admin' ? '/admin/dashboard' : '/user/items';
+  };
 
   return (
     <div>
@@ -24,8 +29,14 @@ const App = () => {
       )}
 
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Navigate to={getDefaultRoute()} replace />} />
+
+        <Route
+          path="/login"
+          element={
+            isLoggedIn ? <Navigate to={getDefaultRoute()} replace /> : <Login />
+          }
+        />
 
         <Route
           path="/user/items"

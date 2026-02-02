@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import { Eye, EyeOff } from 'lucide-react';
-import { assets } from '../assets/assets';
 import axiosInstance from '../config/axiosInstance';
 import { toast } from 'react-toastify';
 import { GoogleLogin } from '@react-oauth/google';
@@ -19,13 +18,8 @@ const Login: React.FC = () => {
 
   if (!context) return null;
 
-  const {
-    backendUrl,
-    setIsLoggedIn,
-    setUserData,
-    globalLoading,
-    setGlobalLoading,
-  } = context;
+  const { setIsLoggedIn, setUserData, globalLoading, setGlobalLoading } =
+    context;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,4 +1,4 @@
-import React, { createContext, useState, type ReactNode } from 'react';
+import { createContext, useState, type ReactNode } from 'react';
 import type { User } from '../types';
 
 interface AppContextType {
@@ -16,16 +16,34 @@ export const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState(null);
+  // Initialize state from localStorage directly
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return !!localStorage.getItem('token');
+  });
+
+  const [userData, setUserData] = useState<User | null>(() => {
+    const savedUserData = localStorage.getItem('userData');
+    return savedUserData ? JSON.parse(savedUserData) : null;
+  });
+
   const [globalLoading, setGlobalLoading] = useState(false);
+
+  // Save user data to localStorage when it changes
+  const handleSetUserData = (user: User | null) => {
+    setUserData(user);
+    if (user) {
+      localStorage.setItem('userData', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('userData');
+    }
+  };
 
   const value = {
     backendUrl,
     isLoggedIn,
     setIsLoggedIn,
     userData,
-    setUserData,
+    setUserData: handleSetUserData,
     globalLoading,
     setGlobalLoading,
   };
