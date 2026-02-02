@@ -3,6 +3,7 @@ import { AppContext } from '../../context/AppContext';
 import axiosInstance from '../../config/axiosInstance';
 import { toast } from 'react-toastify';
 import type { Item } from '../../types';
+import Navbar from '../../components/Navbar';
 
 const AdminDashboard: React.FC = () => {
   const context = useContext(AppContext);
@@ -95,8 +96,9 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gray-100">
+      <Navbar />
+      <div className="max-w-6xl mx-auto p-6">
         <div className="bg-white p-6 rounded-lg shadow mb-6">
           <h1 className="text-2xl font-bold">Admin Dashboard</h1>
           <p className="text-gray-600">Welcome, {userData?.name}</p>
