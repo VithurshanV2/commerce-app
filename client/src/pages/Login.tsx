@@ -5,6 +5,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { assets } from '../assets/assets';
 import axiosInstance from '../config/axiosInstance';
 import { toast } from 'react-toastify';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -67,12 +68,6 @@ const Login: React.FC = () => {
     } finally {
       setGlobalLoading(false);
     }
-  };
-
-  const handleGoogleLogin = () => {
-    setGlobalLoading(true);
-    window.open(backendUrl + '/api/auth/google', '_self');
-    console.log(backendUrl);
   };
 
   return (
@@ -145,19 +140,39 @@ const Login: React.FC = () => {
             <hr className="grow border-gray-300" />
           </div>
 
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            disabled={globalLoading}
-            className="w-full py-3 border border-gray-300 rounded-lg bg-white text-gray-700 font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <img
-              src={assets.google_icon}
-              alt="google icon"
-              className="w-5 h-5"
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                if (!credentialResponse.credential) {
+                  toast.error('No Google credential received');
+                  return;
+                }
+
+                try {
+                  setGlobalLoading(true);
+
+                  const { data } = await axiosInstance.post(
+                    '/api/auth/google-login',
+                    { googleToken: credentialResponse.credential }
+                  );
+
+                  localStorage.setItem('token', data.token);
+                  setIsLoggedIn(true);
+                  setUserData(data.user);
+
+                  toast.success(data.message);
+                  navigate('/user/items');
+                } catch (err: any) {
+                  toast.error(
+                    err.response?.data?.message || 'Google login failed'
+                  );
+                } finally {
+                  setGlobalLoading(false);
+                }
+              }}
+              onError={() => toast.error('Google login failed')}
             />
-            Continue with Google
-          </button>
+          </div>
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-4">
