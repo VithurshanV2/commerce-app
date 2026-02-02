@@ -3,6 +3,7 @@ import { AppContext } from './context/AppContext';
 import { Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
 import UserItems from './pages/user/UserItems';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 const App = () => {
   const context = useContext(AppContext);
@@ -25,6 +26,7 @@ const App = () => {
         <Route path="/" element={<div>Home Page</div>} />
         <Route path="/login" element={<Login />} />
         <Route path="/user/items" element={<UserItems />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
     </div>
   );
