@@ -4,6 +4,7 @@ import axiosInstance from '../../config/axiosInstance';
 import { toast } from 'react-toastify';
 import type { Item } from '../../types';
 import Navbar from '../../components/Navbar';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 const AdminDashboard: React.FC = () => {
   const context = useContext(AppContext);
@@ -184,7 +185,7 @@ const AdminDashboard: React.FC = () => {
                 {items.map((item) => (
                   <tr key={item.id} className="border-t">
                     <td className="px-6 py-4">{item.name}</td>
-                    <td className="px-6 py-4">${item.price}</td>
+                    <td className="px-6 py-4">{formatCurrency(item.price)}</td>
                     <td className="px-6 py-4">{item.quantity}</td>
                     <td className="px-6 py-4 flex gap-2">
                       <button

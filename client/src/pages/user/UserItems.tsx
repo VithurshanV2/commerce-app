@@ -4,6 +4,7 @@ import axiosInstance from '../../config/axiosInstance';
 import { toast } from 'react-toastify';
 import type { Item } from '../../types';
 import Navbar from '../../components/Navbar';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 const UserItems: React.FC = () => {
   const context = useContext(AppContext);
@@ -50,7 +51,9 @@ const UserItems: React.FC = () => {
             {items.map((item) => (
               <div key={item.id} className="bg-white p-6 rounded-lg shadow">
                 <h3 className="text-xl font-semibold mb-2">{item.name}</h3>
-                <p className="text-gray-600 mb-2">Price: ${item.price}</p>
+                <p className="text-gray-600 mb-2">
+                  Price: {formatCurrency(item.price)}
+                </p>
                 <p className="text-gray-600">
                   Available: {item.quantity} units
                 </p>
