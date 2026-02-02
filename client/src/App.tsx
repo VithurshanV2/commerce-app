@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { AppContext } from './context/AppContext';
 import { Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
+import UserItems from './pages/user/UserItems';
 
 const App = () => {
   const context = useContext(AppContext);
@@ -23,6 +24,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<div>Home Page</div>} />
         <Route path="/login" element={<Login />} />
+        <Route path="/user/items" element={<UserItems />} />
       </Routes>
     </div>
   );
