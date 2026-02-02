@@ -1,9 +1,10 @@
 import React, { useContext } from 'react';
 import { AppContext } from './context/AppContext';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
 import UserItems from './pages/user/UserItems';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
   const context = useContext(AppContext);
@@ -23,10 +24,26 @@ const App = () => {
       )}
 
       <Routes>
-        <Route path="/" element={<div>Home Page</div>} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/user/items" element={<UserItems />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
+        <Route
+          path="/user/items"
+          element={
+            <ProtectedRoute requiredRole="User">
+              <UserItems />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute requiredRole="Admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );
